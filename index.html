@@ -3013,8 +3013,13 @@
         const formStatus = document.getElementById('formStatus');
 
         if (contactForm) {
-            contactForm.addEventListener('submit', async function(e) {
-                e.preventDefault(); // Prevent default form submission
+    contactForm.addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent default form submission
+
+        if (!contactForm.checkValidity()) {
+            contactForm.reportValidity();
+            return;
+        }
 
                 // Prevent duplicate submissions
                 if (submitBtn.disabled) return;
