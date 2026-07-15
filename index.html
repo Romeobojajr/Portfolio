@@ -3029,12 +3029,16 @@
 const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
 if (!emailRegex.test(email)) {
-    formStatus.textContent = '✗ Please enter a valid email address (example: romeobojajrgmail.com)';
+    formStatus.textContent = '✗ Please enter a valid email address (example: romeobojajr@gmail.com)';
     formStatus.className = 'form-status error';
     formStatus.style.display = 'block';
+    submitBtn.disabled = false;
+    btnText.style.display = 'inline-flex';
+    btnLoading.style.display = 'none';
     return;
 }
-
+// Hide any previous error message
+formStatus.style.display = 'none';
                 // Prevent duplicate submissions
                 if (submitBtn.disabled) return;
 
