@@ -1316,14 +1316,13 @@
                 let response;
 
                 try {
-                    // FIX: Using the dedicated /ajax/ endpoint prevents CORS and JSON parsing errors
-                    response = await fetch('https://formsubmit.co/ajax/el/vujale', {
+                    // FIX: Corrected AJAX endpoint format (removed '/el/' which was causing 404 errors)
+                    response = await fetch('https://formsubmit.co/ajax/vujale', {
                         method: 'POST',
                         body: formData,
                         headers: { 'Accept': 'application/json' }
                     });
 
-                    // The /ajax/ endpoint guarantees a JSON response
                     const responseData = await response.json();
 
                     if (response.ok && responseData.success) {
