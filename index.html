@@ -336,6 +336,7 @@
         .form-status { display: none; margin-bottom: 20px; padding: 12px 15px; border-radius: 8px; font-size: 0.9rem; text-align: center; font-weight: 500; transition: all 0.3s ease; }
         .form-status.success { display: block; background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
         .form-status.error { display: block; background: rgba(248, 113, 113, 0.1); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
+        .form-status.warning { display: block; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
 
         /* Success Modal */
         .success-modal-overlay {
@@ -897,7 +898,7 @@
 
                     <div class="contact-form fade-in">
                         <form id="contactForm" action="https://formsubmit.co/romeobojajr@gmail.com" method="POST" aria-label="Contact Form" novalidate>
-                            <input type="hidden" name="_captcha" value="true">
+                            <input type="hidden" name="_captcha" value="false">
                             <input type="hidden" name="_template" value="table">
                             <input type="hidden" name="_subject" value="New Portfolio Contact Message">
                             <input type="hidden" name="_next" value="https://romeobojajr.github.io/Portfolio/">
@@ -1235,22 +1236,19 @@
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         if (contactForm) {
-            // 1. DISABLE BROWSER NATIVE POPUPS to prevent "dual errors"
             contactForm.setAttribute('novalidate', 'novalidate');
 
-            // AUTO-HIDE ERRORS WHEN USER STARTS TYPING OR CHANGING
             contactForm.addEventListener('input', function(e) {
                 const target = e.target;
                 const errorEl = document.getElementById(target.id + 'Error');
                 if (errorEl) errorEl.style.display = 'none';
                 
-                if (formStatus.style.display === 'block' || formStatus.classList.contains('error')) {
+                if (formStatus.style.display === 'block') {
                     formStatus.style.display = 'none';
                     formStatus.className = 'form-status';
                 }
             });
 
-            // Also listen for 'change' events specifically for the dropdown
             contactForm.addEventListener('change', function(e) {
                 if (e.target.tagName === 'SELECT') {
                     const errorEl = document.getElementById(e.target.id + 'Error');
@@ -1258,7 +1256,6 @@
                 }
             });
 
-            // CHARACTER COUNTER FOR MESSAGE FIELD
             messageInput.addEventListener('input', function() {
                 const currentLength = this.value.length;
                 charCount.textContent = `${currentLength} / 1000`;
@@ -1271,7 +1268,6 @@
                 if (messageErrorEl) messageErrorEl.style.display = 'none';
             });
 
-            // FORM SUBMISSION HANDLER
             contactForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
@@ -1282,7 +1278,6 @@
                 let isValid = true;
                 let firstInvalidField = null;
 
-                // Helper function to handle error display and focus tracking cleanly
                 const validateField = (input, isInvalid, errorId) => {
                     const errorEl = document.getElementById(errorId);
                     if (isInvalid) {
@@ -1295,32 +1290,21 @@
                     }
                 };
 
-                // 1. VALIDATE NAME FIELD
                 if (!validateField(nameInput, !nameRegex.test(nameInput.value.trim()), 'nameError')) isValid = false;
-
-                // 2. VALIDATE EMAIL FIELD
                 if (!validateField(emailInput, !emailRegex.test(emailInput.value.trim()), 'emailError')) isValid = false;
-
-                // 3. VALIDATE SERVICE DROPDOWN
                 if (!validateField(serviceInput, serviceInput.value === '', 'serviceError')) isValid = false;
-
-                // 4. VALIDATE MESSAGE LENGTH
                 if (!validateField(messageInput, messageInput.value.trim().length < 10, 'messageError')) isValid = false;
 
                 if (!isValid) {
-                    // Focus the first invalid field for better UX (replaces browser's default behavior)
                     if (firstInvalidField) {
                         firstInvalidField.focus();
-                        // Smooth scroll to the error on mobile
                         firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                    return; // Stop submission WITHOUT triggering any browser popup
+                    return;
                 }
 
-                // PREVENT DOUBLE-CLICK SUBMISSIONS
                 if (submitBtn.disabled) return;
 
-                // SHOW PRO LOADING STATE
                 submitBtn.disabled = true;
                 btnText.style.display = 'none';
                 btnLoading.style.display = 'inline-flex';
@@ -1341,16 +1325,15 @@
                     if (contentType && contentType.includes("application/json")) {
                         responseData = await response.json();
                     } else {
-                        // Fallback: if it's not JSON but response is OK, treat as success.
                         if (response.ok) {
                             responseData = { success: true };
                         } else {
-                            throw new Error('Server returned an unexpected response.');
+                            // FIX: Now shows the exact HTTP status code if FormSubmit rejects the request
+                            throw new Error('FormSubmit rejected the request (Status ' + response.status + '). It may have been flagged as spam.');
                         }
                     }
 
                     if (response.ok && (responseData.success || responseData.message === "success")) {
-                        // PROFESSIONAL SUCCESS POPUP
                         successModal.classList.add('active');
                         contactForm.reset();
                         charCount.textContent = '0 / 1000';
@@ -1360,12 +1343,12 @@
                     }
                 } catch (error) {
                     console.error('Form submission error:', error);
-                    // Fallback for FormSubmit redirecting to _next page (returns HTML, causing JSON parse error)
+                    
+                    // Detect if FormSubmit returned an HTML "Activate your email" page instead of JSON
                     if (error instanceof SyntaxError && response && response.ok) {
-                        successModal.classList.add('active');
-                        contactForm.reset();
-                        charCount.textContent = '0 / 1000';
-                        charCount.className = 'char-count';
+                        formStatus.textContent = '️ Action Required: Please check your inbox (and spam folder) at romeobojajr@gmail.com for an activation email from FormSubmit. You must click "Activate" before you can receive messages.';
+                        formStatus.className = 'form-status warning';
+                        formStatus.style.display = 'block';
                     } else {
                         formStatus.textContent = '✗ Error: ' + (error.message || 'Something went wrong. Please try again or email me directly.');
                         formStatus.className = 'form-status error';
@@ -1377,14 +1360,12 @@
                         }, 8000);
                     }
                 } finally {
-                    // RE-ENABLE BUTTON & HIDE SPINNER
                     submitBtn.disabled = false;
                     btnText.style.display = 'inline-flex';
                     btnLoading.style.display = 'none';
                 }
             });
 
-            // CLOSE MODAL HANDLERS
             closeSuccessModalBtn.addEventListener('click', () => {
                 successModal.classList.remove('active');
             });
