@@ -899,6 +899,8 @@
                     <div class="contact-form fade-in">
                         <form id="contactForm" action="https://formsubmit.co/el/vujale" method="POST" aria-label="Contact Form" novalidate>
                             <input type="hidden" name="_captcha" value="false">
+                            <!-- SECURITY FIX: Honeypot field added to silently trap spam bots -->
+                            <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
                             <input type="hidden" name="_template" value="table">
                             <input type="hidden" name="_subject" value="New Portfolio Contact Message">
                             <input type="hidden" name="_next" value="https://romeobojajr.github.io/Portfolio/">
@@ -1314,26 +1316,17 @@
                 let response;
 
                 try {
-                    response = await fetch('https://formsubmit.co/el/vujale', {
+                    // FIX: Using the dedicated /ajax/ endpoint prevents CORS and JSON parsing errors
+                    response = await fetch('https://formsubmit.co/ajax/el/vujale', {
                         method: 'POST',
                         body: formData,
                         headers: { 'Accept': 'application/json' }
                     });
 
-                    let responseData;
-                    const contentType = response.headers.get("content-type");
-                    if (contentType && contentType.includes("application/json")) {
-                        responseData = await response.json();
-                    } else {
-                        if (response.ok) {
-                            responseData = { success: true };
-                        } else {
-                            // FIX: Now shows the exact HTTP status code if FormSubmit rejects the request
-                            throw new Error('FormSubmit rejected the request (Status ' + response.status + '). It may have been flagged as spam.');
-                        }
-                    }
+                    // The /ajax/ endpoint guarantees a JSON response
+                    const responseData = await response.json();
 
-                    if (response.ok && (responseData.success || responseData.message === "success")) {
+                    if (response.ok && responseData.success) {
                         successModal.classList.add('active');
                         contactForm.reset();
                         charCount.textContent = '0 / 1000';
@@ -1343,22 +1336,14 @@
                     }
                 } catch (error) {
                     console.error('Form submission error:', error);
+                    formStatus.textContent = '✗ Error: ' + (error.message || 'Something went wrong. Please try again or email me directly.');
+                    formStatus.className = 'form-status error';
+                    formStatus.style.display = 'block';
                     
-                    // Detect if FormSubmit returned an HTML "Activate your email" page instead of JSON
-                    if (error instanceof SyntaxError && response && response.ok) {
-                        formStatus.textContent = '️ Action Required: Please check your inbox (and spam folder) at romeobojajr@gmail.com for an activation email from FormSubmit. You must click "Activate" before you can receive messages.';
-                        formStatus.className = 'form-status warning';
-                        formStatus.style.display = 'block';
-                    } else {
-                        formStatus.textContent = '✗ Error: ' + (error.message || 'Something went wrong. Please try again or email me directly.');
-                        formStatus.className = 'form-status error';
-                        formStatus.style.display = 'block';
-                        
-                        setTimeout(() => { 
-                            formStatus.style.display = 'none'; 
-                            formStatus.className = 'form-status';
-                        }, 8000);
-                    }
+                    setTimeout(() => { 
+                        formStatus.style.display = 'none'; 
+                        formStatus.className = 'form-status';
+                    }, 8000);
                 } finally {
                     submitBtn.disabled = false;
                     btnText.style.display = 'inline-flex';
