@@ -31,8 +31,8 @@
     <meta name="twitter:description" content="IT Support Specialist with 7+ years of experience, Virtual Assistant, and Photo/Video Editor. Providing reliable technical support and high-quality digital content.">
     <meta name="twitter:image" content="https://romeobojajr.vercel.app/assets/image/preview.jpg">
 
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' data: https:; connect-src 'self' https://formsubmit.co https://api.web3forms.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co https://api.web3forms.com;">
+    <!-- Content Security Policy (Updated to allow EmailJS locally and online) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' data: https:; connect-src 'self' https://formsubmit.co https://api.web3forms.com https://api.emailjs.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co https://api.web3forms.com;">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NkYGCQAAAABQABh6FO1AAAAABJRU5ErkJggg==">
@@ -1320,7 +1320,6 @@
                     </div>
 
                     <div class="contact-form fade-in">
-                        <!-- Native HTML5 validation enabled (no 'novalidate') -->
                         <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
                         <input type="hidden" name="access_key" value="1f7ba558-accb-45ab-9545-5ce77aa93c26">
                         <input type="hidden" name="subject" value="New Portfolio Contact Message">
@@ -1397,6 +1396,16 @@
             <button class="success-modal-btn" id="closeSuccessModal">Awesome!</button>
         </div>
     </div>
+
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // ⚠️ YOU MUST REPLACE 'YOUR_PUBLIC_KEY' WITH YOUR ACTUAL EMAILJS PUBLIC KEY ⚠️
+            // Find it in your EmailJS Dashboard -> Account -> General -> Public Key
+            emailjs.init("YOUR_PUBLIC_KEY");
+        })();
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
@@ -1753,12 +1762,10 @@
             });
             
             contactForm.addEventListener('submit', async function(e) {
-                // If the form is invalid, let the browser show its native popup immediately!
                 if (!contactForm.checkValidity()) {
                     return; 
                 }
 
-                // Form is valid, now prevent page reload and send via AJAX
                 e.preventDefault();
                 
                 if (submitBtn.disabled) return;
@@ -1767,17 +1774,30 @@
                 btnText.innerHTML = '<div class="btn-loading"><span class="premium-spinner"></span><span>Sending...</span></div>';
                 formStatus.style.display = 'none';
                 
-                const formData = new FormData(contactForm); let response;
+                const formData = new FormData(contactForm);
+                const templateParams = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    service: formData.get('service'),
+                    message: formData.get('message')
+                };
+
                 try {
-                    response = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
-                    const responseData = await response.json();
-                    if (response.ok && responseData.success) {
-                        successModal.classList.add('active'); contactForm.reset(); charCount.textContent = '0 / 1000'; charCount.className = 'char-count';
-                    } else { throw new Error(responseData.message || 'Failed to send message. Please try again.'); }
+                    // 1. Send notification email to you
+                    await emailjs.send('service_romeoboja', 'template_3mxy9yk', templateParams);
+                    
+                    // 2. Send auto-reply email to the visitor
+                    await emailjs.send('service_romeoboja', 'template_ka7330n', templateParams);
+
+                    successModal.classList.add('active'); 
+                    contactForm.reset(); 
+                    charCount.textContent = '0 / 1000'; 
+                    charCount.className = 'char-count';
                 } catch (error) {
-                    console.error('Form submission error:', error);
-                    formStatus.textContent = ' Error: ' + (error.message || 'Something went wrong. Please try again or email me directly.');
-                    formStatus.className = 'form-status error'; formStatus.style.display = 'block';
+                    console.error('EmailJS submission error:', error);
+                    formStatus.textContent = ' Error: Something went wrong. Please try again or email me directly.';
+                    formStatus.className = 'form-status error'; 
+                    formStatus.style.display = 'block';
                     setTimeout(() => { formStatus.style.display = 'none'; formStatus.className = 'form-status'; }, 8000);
                 } finally {
                     submitBtn.disabled = false;
