@@ -221,7 +221,7 @@
         .project-tags { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
         .project-tags .portfolio-tag { margin-top: 0; }
 
-        /* Outlined Pill Toggle with Subtle Breathing Animation (No hover gradient/shadow) */
+        /* Outlined Pill Toggle with Subtle Breathing Animation */
         .responsibilities-toggle {
             font-family: var(--font-body);
             font-size: 0.8rem;
@@ -400,8 +400,40 @@
         .review-card { background: var(--bg-card); padding: 40px; border-radius: 15px; border: 1px solid var(--border-color); transition: all 0.3s ease; position: relative; cursor: pointer; height: 100%; display: flex; flex-direction: column; }
         .review-card:hover { border-color: var(--border-hover); transform: translateY(-5px); }
         .review-card::before { content: '"'; position: absolute; top: 20px; right: 30px; font-size: 4rem; color: var(--gold); opacity: 0.2; font-family: var(--font-heading); }
-        .review-view-hint { position: absolute; bottom: 15px; right: 20px; font-size: 0.75rem; color: var(--gold); opacity: 0; transition: opacity 0.3s ease; display: flex; align-items: center; gap: 5px; }
-        .review-card:hover .review-view-hint { opacity: 1; }
+        
+        /* UPDATED: Review View Hint - Visible by default with breathing animation */
+        .review-view-hint { 
+            position: absolute; 
+            bottom: 15px; 
+            right: 20px; 
+            font-size: 0.75rem; 
+            color: var(--gold); 
+            opacity: 0.85; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            animation: breathe-hint 2.5s ease-in-out infinite;
+        }
+        
+        @keyframes breathe-hint {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% { 
+                transform: scale(1.08);
+                opacity: 1;
+                text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+            }
+        }
+
+        .review-card:hover .review-view-hint { 
+            opacity: 1; 
+            animation: none;
+            transform: scale(1.08);
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+        }
+        
         .review-stars { margin-bottom: 20px; }
         .review-stars i { color: var(--gold); font-size: 0.9rem; }
         .review-text { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.8; margin-bottom: 25px; font-style: italic; }
@@ -586,6 +618,101 @@
         .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
         .back-to-top:hover { transform: translateY(-5px); background: var(--gold-dark); }
 
+        /* ============ FLOATING CHAT BUTTONS - PRO LIVE INDICATOR ============ */
+        .floating-chat {
+            position: fixed;
+            bottom: 90px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 998;
+        }
+        .chat-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #fff;
+            font-size: 1.4rem;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: translateX(20px);
+            animation: slideInChat 0.5s ease forwards;
+        }
+        
+        /* The "Live" Pulse Layer */
+        .chat-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            z-index: -1;
+            /* 2s duration, negative delays guarantee they never sync up */
+            animation: pulse-live 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .chat-btn.whatsapp { background: #25D366; }
+        .chat-btn.whatsapp::before { background: #25D366; animation-delay: 0s; }
+        
+        .chat-btn.viber { background: #7360F2; }
+        .chat-btn.viber::before { background: #7360F2; animation-delay: -0.7s; }
+        
+        .chat-btn.messenger { background: linear-gradient(135deg, #00C6FF, #0072FF); }
+        .chat-btn.messenger::before { background: #0084FF; animation-delay: -1.4s; }
+
+        @keyframes slideInChat {
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* Smooth scaling pulse using transform (GPU accelerated) */
+        @keyframes pulse-live {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.7); opacity: 0; }
+        }
+        
+        .chat-btn:hover {
+            transform: translateY(-3px) scale(1.1);
+        }
+        
+        .chat-btn .chat-tooltip {
+            position: absolute;
+            right: 60px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+        .chat-btn .chat-tooltip::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-left: 6px solid var(--bg-card);
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+        }
+        .chat-btn:hover .chat-tooltip {
+            opacity: 1;
+            visibility: visible;
+            right: 58px;
+        }
+
         .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
         .fade-in.visible { opacity: 1; transform: translateY(0); }
         .stagger-item { opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
@@ -654,6 +781,10 @@
             .modal-content.fullsize-mode { flex-direction: column-reverse; max-height: 90vh; }
             .modal-content.fullsize-mode .modal-body { max-width: 100%; padding: 25px; max-height: 40vh; }
             .modal-content.fullsize-mode .modal-image { border-radius: 20px 20px 0 0; max-height: 50vh; }
+            
+            .floating-chat { bottom: 90px; right: 20px; }
+            .chat-btn { width: 45px; height: 45px; font-size: 1.2rem; }
+            .chat-btn .chat-tooltip { display: none; }
         }
     </style>
 </head>
@@ -1022,13 +1153,15 @@
                         </div>
                         <div class="portfolio-info"><h3>Event Highlights</h3><p>Event footage edited into a highlight reel with transitions.</p><span class="portfolio-tag">Video Editing</span></div>
                     </div>
+                    
+                    <!-- Photo Restoration (Multiple Samples Carousel) -->
                     <div class="portfolio-item fade-in" data-category="photo" data-title="Photo Restoration" data-description="Restored an old and damaged photo by repairing imperfections, enhancing details, recovering colors, and improving overall image quality while preserving its original character." data-tools="Adobe Photoshop, AI Enhancement" data-duration="Single Image" data-type="Photo Restoration">
                         <div class="portfolio-thumbnail photo-slider-container">
                             <div class="swiper photo-swiper">
                                 <div class="swiper-wrapper">
-                                    <div class="swiper-slide"><img src="assets/image/sample-edit-1.jpg" alt="Portrait 1" class="slider-photo" loading="lazy"></div>
-                                    <div class="swiper-slide"><img src="assets/image/sample-edit-2.jpg" alt="Portrait 2" class="slider-photo" loading="lazy"></div>
-                                    <div class="swiper-slide"><img src="assets/image/sample-edit-3.jpg" alt="Portrait 3" class="slider-photo" loading="lazy"></div>
+                                    <div class="swiper-slide"><img src="assets/image/sample-edit-1.jpg" alt="Restoration Sample 1" class="slider-photo" loading="lazy"></div>
+                                    <div class="swiper-slide"><img src="assets/image/sample-edit-2.jpg" alt="Restoration Sample 2" class="slider-photo" loading="lazy"></div>
+                                    <div class="swiper-slide"><img src="assets/image/sample-edit-3.jpg" alt="Restoration Sample 3" class="slider-photo" loading="lazy"></div>
                                 </div>
                                 <div class="swiper-button-next"></div><div class="swiper-button-prev"></div>
                             </div>
@@ -1036,13 +1169,15 @@
                         </div>
                         <div class="portfolio-info"><h3>Photo Restoration</h3><p>Old or damaged photos restored with repaired details, enhanced colors, and improved overall image quality.</p><span class="portfolio-tag">Photo Editing</span></div>
                     </div>
+                    
+                    <!-- Photo Retouching (Multiple Samples Carousel) -->
                     <div class="portfolio-item fade-in" data-category="photo" data-title="Photo Retouching" data-description="Professional photo retouching with natural body refinement, lighting enhancement, color correction, and realistic image improvements." data-tools="Adobe Photoshop, AI Enhancement" data-duration="Single Image" data-type="Client Photo Retouching">
                         <div class="portfolio-thumbnail photo-slider-container">
                             <div class="swiper photo-swiper">
                                 <div class="swiper-wrapper">
-                                    <div class="swiper-slide"><img src="assets/image/sample-edit-2.jpg" alt="Product 1" class="slider-photo" loading="lazy"></div>
-                                    <div class="swiper-slide"><img src="assets/image/sample-edit-3.jpg" alt="Product 2" class="slider-photo" loading="lazy"></div>
-                                    <div class="swiper-slide"><img src="assets/image/sample-edit-1.jpg" alt="Product 3" class="slider-photo" loading="lazy"></div>
+                                    <div class="swiper-slide"><img src="assets/image/sample-edit-2.jpg" alt="Retouching Sample 1" class="slider-photo" loading="lazy"></div>
+                                    <div class="swiper-slide"><img src="assets/image/sample-edit-3.jpg" alt="Retouching Sample 2" class="slider-photo" loading="lazy"></div>
+                                    <div class="swiper-slide"><img src="assets/image/sample-edit-1.jpg" alt="Retouching Sample 3" class="slider-photo" loading="lazy"></div>
                                 </div>
                                 <div class="swiper-button-next"></div><div class="swiper-button-prev"></div>
                             </div>
@@ -1050,13 +1185,15 @@
                         </div>
                         <div class="portfolio-info"><h3>Photo Retouching</h3><p>Photo retouching with body refinement and color adjustments.</p><span class="portfolio-tag">Photo Editing</span></div>
                     </div>
+                    
+                    <!-- Photo Manipulation (Multiple Samples Carousel) -->
                     <div class="portfolio-item fade-in" data-category="photo" data-title="Photo Manipulation" data-description="Creative photo editing with seamless object replacement, compositing, and realistic visual effects." data-tools="Adobe Photoshop, AI Restoration" data-duration="Single Image" data-type="Photo Manipulation">
                         <div class="portfolio-thumbnail photo-slider-container">
                             <div class="swiper photo-swiper">
                                 <div class="swiper-wrapper">
-                                    <div class="swiper-slide"><img src="assets/image/sample-edit-3.jpg" alt="Enhancement 1" class="slider-photo" loading="lazy"></div>
-                                    <div class="swiper-slide"><img src="assets/image/sample-edit-1.jpg" alt="Enhancement 2" class="slider-photo" loading="lazy"></div>
-                                    <div class="swiper-slide"><img src="assets/image/sample-edit-2.jpg" alt="Enhancement 3" class="slider-photo" loading="lazy"></div>
+                                    <div class="swiper-slide"><img src="assets/image/sample-edit-3.jpg" alt="Manipulation Sample 1" class="slider-photo" loading="lazy"></div>
+                                    <div class="swiper-slide"><img src="assets/image/sample-edit-1.jpg" alt="Manipulation Sample 2" class="slider-photo" loading="lazy"></div>
+                                    <div class="swiper-slide"><img src="assets/image/sample-edit-2.jpg" alt="Manipulation Sample 3" class="slider-photo" loading="lazy"></div>
                                 </div>
                                 <div class="swiper-button-next"></div><div class="swiper-button-prev"></div>
                             </div>
@@ -1102,7 +1239,7 @@
                 <div class="reviews-grid">
                     <div class="review-card fade-in" data-name="Liz Rogers" data-role="Small Business Owner" data-initials="JD" data-image="assets/image/liz-rogers-client-1.jpg" data-review="Romeo did a great job editing my video. He was responsive, delivered on time, and the final output was clean and exactly what I needed. Very satisfied with the work!">
                         <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        <p class="review-text">"Romeo did a great job editing my video. He was responsive, delivered on time, and the final output was clean and exactly what I needed. Very satisfied with the work!"</p>
+                        <p class="review-text">"Romeo did a great job editing my video. He was responsive, delivered on time..."</p>
                         <div class="review-author">
                             <img src="assets/image/liz-rogers-client-1.jpg" alt="Liz Rogers Profile" class="review-avatar" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="review-avatar-placeholder" style="display: none;">JD</div>
@@ -1112,7 +1249,7 @@
                     </div>
                     <div class="review-card fade-in" data-name="Erin Gallowa" data-role="Freelance Content Creator" data-initials="SM" data-image="assets/image/erin-gallowa-client-2.jpg" data-review="Working with Romeo was a good experience. He edited my photos nicely and was open to feedback. The results looked professional and I was happy with the outcome. Would recommend him for editing tasks.">
                         <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        <p class="review-text">"Working with Romeo was a good experience. He edited my photos nicely and was open to feedback. The results looked professional and I was happy with the outcome. Would recommend him for editing tasks."</p>
+                        <p class="review-text">"Working with Romeo was a good experience. He edited my photos nicely and was open to feedback..."</p>
                         <div class="review-author">
                             <img src="assets/image/erin-gallowa-client-2.jpg" alt="Erin Gallowa Profile" class="review-avatar" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="review-avatar-placeholder" style="display: none;">SM</div>
@@ -1122,7 +1259,7 @@
                     </div>
                     <div class="review-card fade-in" data-name="Steven Cutit" data-role="Online Shop Owner" data-initials="RL" data-image="assets/image/steven-cutit-client-3.jpg" data-review="Romeo helped me with photo editing for my online shop. He was reliable, communicated well, and delivered the edited photos on time. The quality was good and I appreciated his attention to detail.">
                         <div class="review-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        <p class="review-text">"Romeo helped me with photo editing for my online shop. He was reliable, communicated well, and delivered the edited photos on time. The quality was good and I appreciated his attention to detail."</p>
+                        <p class="review-text">"Romeo helped me with photo editing for my online shop. He was reliable, communicated well..."</p>
                         <div class="review-author">
                             <img src="assets/image/steven-cutit-client-3.jpg" alt="Steven Cutit Profile" class="review-avatar" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="review-avatar-placeholder" style="display: none;">RL</div>
@@ -1192,7 +1329,7 @@
                             
                             <div class="form-group">
                                 <label for="name">Your Name *</label>
-                                <input type="text" id="name" name="name" required placeholder="e.g., Romeo" aria-required="true" pattern="[A-Za-z\s'\-]+" title="Please enter a valid name (letters only, no numbers)." maxlength="30">
+                                <input type="text" id="name" name="name" required placeholder="e.g., Romeo" aria-required="true" pattern="[A-Za-z\s'\-]+" title="Please enter a valid name (letters only, no numbers)." maxlength="20">
                             </div>
                             <div class="form-group">
                                 <label for="email">Your Email *</label>
@@ -1235,6 +1372,22 @@
     </footer>
 
     <button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- Floating Chat Buttons - Pro Live Indicator -->
+    <div class="floating-chat" aria-label="Quick contact options">
+        <a href="https://wa.me/639947115643" target="_blank" rel="noopener noreferrer" class="chat-btn whatsapp" aria-label="Chat on WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+            <span class="chat-tooltip">WhatsApp</span>
+        </a>
+        <a href="viber://chat?number=639947115643" class="chat-btn viber" aria-label="Chat on Viber">
+            <i class="fab fa-viber"></i>
+            <span class="chat-tooltip">Viber</span>
+        </a>
+        <a href="https://m.me/ViralBrainStudio" target="_blank" rel="noopener noreferrer" class="chat-btn messenger" aria-label="Chat on Messenger">
+            <i class="fab fa-facebook-messenger"></i>
+            <span class="chat-tooltip">Messenger</span>
+        </a>
+    </div>
 
     <div class="success-modal-overlay" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
         <div class="success-modal-content">
@@ -1600,7 +1753,12 @@
             });
             
             contactForm.addEventListener('submit', async function(e) {
-                // Prevent default form submission so the page doesn't reload and the success modal can show
+                // If the form is invalid, let the browser show its native popup immediately!
+                if (!contactForm.checkValidity()) {
+                    return; 
+                }
+
+                // Form is valid, now prevent page reload and send via AJAX
                 e.preventDefault();
                 
                 if (submitBtn.disabled) return;
@@ -1618,7 +1776,7 @@
                     } else { throw new Error(responseData.message || 'Failed to send message. Please try again.'); }
                 } catch (error) {
                     console.error('Form submission error:', error);
-                    formStatus.textContent = '✗ Error: ' + (error.message || 'Something went wrong. Please try again or email me directly.');
+                    formStatus.textContent = ' Error: ' + (error.message || 'Something went wrong. Please try again or email me directly.');
                     formStatus.className = 'form-status error'; formStatus.style.display = 'block';
                     setTimeout(() => { formStatus.style.display = 'none'; formStatus.className = 'form-status'; }, 8000);
                 } finally {
