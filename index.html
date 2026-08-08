@@ -148,12 +148,22 @@ section { padding: 100px 30px; }
 .portfolio-item { position: relative; border-radius: 15px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-color); transition: all 0.3s ease; cursor: pointer; }
 .portfolio-item:hover { transform: translateY(-10px); border-color: var(--border-hover); }
 .portfolio-thumbnail { width: 100%; aspect-ratio: 16/9; background: var(--bg-card-hover); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-.portfolio-thumbnail video.portfolio-img, .portfolio-thumbnail img.portfolio-img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; transition: filter 0.3s ease; }
+.portfolio-item[data-category="photo"] .portfolio-thumbnail.photo-slider-container { aspect-ratio: auto; height: auto; min-height: 280px; overflow: hidden; }
+.portfolio-item[data-category="video"] .portfolio-thumbnail { aspect-ratio: 4/4; overflow: hidden; background: #000; }
+.portfolio-thumbnail video.portfolio-img,
+.portfolio-thumbnail img.portfolio-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transition: filter 0.3s ease;
+}
 .portfolio-thumbnail video.portfolio-img:hover, .portfolio-thumbnail img.portfolio-img:hover, .portfolio-thumbnail.blurred video.portfolio-img, .portfolio-thumbnail.blurred img.portfolio-img { filter: blur(4px); }
 .portfolio-thumbnail video.portfolio-img[src=""], .portfolio-thumbnail video.portfolio-img:not([src]), .portfolio-thumbnail img.portfolio-img[src=""], .portfolio-thumbnail img.portfolio-img:not([src]) { display: none; }
 .portfolio-thumbnail video.portfolio-img[src]:not([src=""]) ~ .portfolio-icon, .portfolio-thumbnail img.portfolio-img[src]:not([src=""]) ~ .portfolio-icon { display: none; }
 .portfolio-thumbnail .portfolio-icon { font-size: 3rem; color: var(--gold); opacity: 0.5; position: relative; z-index: 0; }
-.portfolio-item[data-category="photo"] .portfolio-thumbnail.photo-slider-container { aspect-ratio: auto; height: auto; min-height: 280px; overflow: hidden; }
 .photo-swiper { width: 100%; height: 100%; min-height: 280px; }
 .photo-swiper .swiper-slide { display: flex; align-items: center; justify-content: center; background: var(--bg-card-hover); overflow: hidden; }
 .photo-swiper .swiper-slide img.slider-photo { width: 100%; height: auto; max-height: 350px; object-fit: contain; display: block; transition: filter 0.3s ease; }
@@ -186,7 +196,7 @@ section { padding: 100px 30px; }
     max-height: 95vh;
     position: relative;
 }
-.modal-content.fullsize-mode .modal-image { flex: 1; aspect-ratio: auto; min-height: 0; border-radius: 0 20px 20px 0; display: flex; align-items: center; justify-content: center; background: var(--bg-card-hover); padding: 20px; overflow-y: auto; overflow-x: hidden; max-height: 95vh; }
+.modal-content.fullsize-mode .modal-image { flex: 1; aspect-ratio: auto; min-height: 0; border-radius: 0 20px 20px 0; display: flex; align-items: center; justify-content: center; background: var(--bg-card-hover); padding: 20px; overflow: hidden; max-height: 95vh; }
 .modal-content.fullsize-mode .modal-image::-webkit-scrollbar { width: 8px; }
 .modal-content.fullsize-mode .modal-image::-webkit-scrollbar-track { background: var(--bg-card); border-radius: 4px; }
 .modal-content.fullsize-mode .modal-image::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
@@ -220,7 +230,7 @@ section { padding: 100px 30px; }
     transform: rotate(90deg);
 }
 .modal-image { width: 100%; aspect-ratio: 16/9; background: var(--bg-card-hover); display: flex; align-items: center; justify-content: center; border-radius: 20px 20px 0 0; position: relative; overflow: hidden; }
-.modal-image img, .modal-image video.modal-video { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; }
+.modal-image img, .modal-image video.modal-video { width: 100%; height: 100%; object-fit: contain; position: absolute; inset: 0; z-index: 1; }
 .modal-image img[src=""], .modal-image img:not([src]), .modal-image video[src=""], .modal-image video:not([src]) { display: none; }
 .modal-image img[src]:not([src=""]) ~ i, .modal-image video[src]:not([src=""]) ~ i { display: none; }
 .modal-image i { font-size: 5rem; color: var(--gold); opacity: 0.5; }
@@ -472,7 +482,8 @@ footer { margin-bottom: 0; padding-bottom: 16px; }
 <div class="available-badge"><span class="status-dot"></span><span>Available for Hire</span></div>
 <p class="hero-subtitle"><span id="typingText"></span><span class="typing-cursor"></span></p>
 <h1>Romeo <span>Boja Jr.</span></h1>
-<p class="hero-description">I have over 7 years of IT Support experience, including 3 years providing remote and on-site technical support. I also provide photo editing, video editing, and virtual assistant services, helping businesses and content creators with reliable technical support and high-quality digital content.</p>
+<p class="hero-description">I help businesses and content creators with photo and video editing, technical support, and virtual assistance. With 7+ years of IT Support experience and hands-on experience in creative work, I bring practical skills, attention to detail, and a reliable approach to every task.	
+</p>
 <div class="hero-buttons">
 <a href="#portfolio" class="btn btn-primary"><i class="fas fa-play"></i> View My Work</a>
 <a href="assets/romeo-boja-resume.pdf" class="btn btn-secondary" download aria-label="Download Resume"><i class="fas fa-download"></i> Download Resume</a>
@@ -535,8 +546,8 @@ footer { margin-bottom: 0; padding-bottom: 16px; }
 <div class="profile-placeholder" style="display: none;"><i class="fas fa-user"></i></div>
 </div>
 <div class="about-text fade-in">
-<h3>IT Support & Digital Services</h3>
-<p>I have over <strong>7 years of hands-on experience in IT</strong>, including <strong>3 years providing comprehensive remote and on-site support</strong>. My expertise includes troubleshooting hardware and software issues, maintaining Windows environments, and ensuring business operations run smoothly with minimal downtime.</p>
+<h3>IT Support & Creative Services</h3>
+<p>I have over <strong>7 years of hands-on experience in IT</strong>, including <strong>3 years providing remote and on-site support</strong>. My expertise includes troubleshooting hardware and software issues, maintaining Windows environments, and ensuring business operations run smoothly with minimal downtime.</p>
 <p>My technical background spans <strong>Microsoft 365, Google Workspace, Networking, VPNs, Help Desk operations, and Remote Desktop tools</strong>. I also have specialized, hands-on experience supporting systems such as <strong>Hikvision CCTV, POS terminals, SQL Server Management Studio, HRIS platforms, and ZKTeco RFID attendance devices</strong>.</p>
 <p>Beyond IT infrastructure, I provide creative digital services, including <strong>photo editing, video editing, and AI-powered photo restoration</strong> using <strong>Adobe Photoshop, Filmora, and CapCut Pro</strong>. I am passionate about learning new technologies and continuously refining my skills to deliver dependable solutions and high-quality digital content.</p>
 <div class="skills-grid">
@@ -759,7 +770,7 @@ footer { margin-bottom: 0; padding-bottom: 16px; }
 <div class="portfolio-grid" id="portfolioGrid">
 <div class="portfolio-item fade-in" data-category="video" data-title="Trailer Video Edit" data-description="Trailer edited with cinematic cuts, color correction, sound synchronization, and visual effects to create an engaging parody." data-tools="Filmora" data-duration="32 seconds" data-type="Trailer Video">
 <div class="portfolio-thumbnail">
-<video class="portfolio-img" src="assets/video/goblin-parody.mp4" poster="assets/thumbnails/goblin.jpg" autoplay muted loop playsinline></video>
+<video class="portfolio-img" src="assets/video/kerova.mp4" poster="assets/thumbnails/kerova.jpg" autoplay muted loop playsinline></video>
 <i class="fas fa-video portfolio-icon"></i>
 <div class="portfolio-overlay"><i class="fas fa-eye"></i></div>
 </div>
@@ -921,7 +932,7 @@ footer { margin-bottom: 0; padding-bottom: 16px; }
 <div class="contact-content">
 <div class="contact-info fade-in">
 <h3>Let's Work on Your Project</h3>
-<p>If you need help with IT support, virtual assistance, or photo/video editing, feel free to reach out. I'm available for freelance work and happy to discuss your project needs. You can contact me through any of the platforms below, download my resume, or fill out the form.</p>
+<p>Looking for reliable support for your team or project? I’m open to full-time and part-time opportunities in IT Support, Virtual Assistance, and Photo & Video Editing. Feel free to get in touch—I’d be glad to hear about your needs.</p>
 <div class="contact-links">
 <a href="assets/romeo-boja-resume.pdf" class="contact-link" download aria-label="Download Resume">
 <i class="fas fa-file-download"></i>
